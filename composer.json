@@ -10,9 +10,6 @@
     "autoload": {
         "psr-4": {
             "Cityware\\Datagrid\\": "src/"
-        },
-        "psr-0": {
-            "Cityware\\Datagrid\\": "src/"
         }
     },
     "require": {
