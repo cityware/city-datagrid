@@ -161,6 +161,7 @@ class TableNew {
                     case 'date':
                         $class .= ' width-date ';
                         break;
+                    case 'boolean':
                     case 'status':
                         $class .= ' width-status ';
                         break;
