@@ -527,6 +527,7 @@ class DatagridDb {
                                 }
                             } else {
                                 foreach ($getParamsGridButtons['button'] as $keyButons => $valueButons) {
+                                    
                                     $classConfirm = $dataConfirm = null;
                                                                        
                                     if(is_array($valueButons) and (isset($valueButons['confirm']) and $valueButons['confirm'] = true)){
@@ -534,13 +535,13 @@ class DatagridDb {
                                         $classConfirm = ' '.$valueButons['confirmclass'];
                                     }
                                     
-                                    if ($keyButons == 'edit' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button']['edit'] == 'true')) {
+                                    if ($keyButons == 'edit' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
                                         $aButtons[] = '<a title="Editar" href="' . $url . '/edit/id/' . $primaryValue . '" data-id="' . $primaryValue . '" '.$dataConfirm.' class="btn btn-success editbtn '.$classConfirm.'"><i class="fa fa-pencil"></i></a>';
-                                    } else if ($keyButons == 'active' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button']['edit'] == 'true')) {
+                                    } else if ($keyButons == 'active' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
                                         $aButtons[] = '<a title="Ativar" href="' . $url . '/goactive/id/' . $primaryValue . '" data-id="' . $primaryValue . '" '.$dataConfirm.' class="btn btn-primary activebtn '.$classConfirm.'"><i class="fa fa-check-square-o"></i></a>';
-                                    } else if ($keyButons == 'block' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button']['edit'] == 'true')) {
+                                    } else if ($keyButons == 'block' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
                                         $aButtons[] = '<a title="Bloquear" href="' . $url . '/goblock/id/' . $primaryValue . '" data-id="' . $primaryValue . '" '.$dataConfirm.' class="btn btn-warning blockbtn '.$classConfirm.'"><i class="fa fa-ban"></i></a>';
-                                    } else if ($keyButons == 'trash' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button']['edit'] == 'true')) {
+                                    } else if ($keyButons == 'trash' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
                                         $aButtons[] = '<a title="Lixeira" href="' . $url . '/gotrash/id/' . $primaryValue . '" data-id="' . $primaryValue . '" '.$dataConfirm.' class="btn btn-danger trashbtn '.$classConfirm.'"><i class="fa fa-recycle"></i></a>';
                                     }
                                 }
