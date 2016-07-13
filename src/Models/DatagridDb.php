@@ -17,7 +17,7 @@ use Zend\Session\Container as SessionContainer;
  */
 class DatagridDb {
 
-    private $request = null, $translate = null, $sessionAdapter;
+    private $request = null, $translate = null, $rsDatagrid = null, $sessionAdapter;
 
     public function __construct($requestParams, $translate) {
         $this->request = $requestParams;
@@ -328,13 +328,13 @@ class DatagridDb {
             $page = (isset($this->request['ajaxPage']) and ! empty($this->request['ajaxPage'])) ? $this->request['ajaxPage'] : 0;
             $limitPage = (isset($this->request['itensPage']) and ! empty($this->request['itensPage'])) ? $this->request['itensPage'] : 10;
 
-            $rsDatagrid = $db->executeSelectQuery(true, $page, $limitPage);
+            $this->rsDatagrid = $db->executeSelectQuery(true, $page, $limitPage);
         } else {
-            $rsDatagrid = $db->executeSelectQuery(true, 1, 99999999999);
+            $this->rsDatagrid = $db->executeSelectQuery(true, 1, 99999999999);
         }
 
 
-        return $rsDatagrid;
+        return $this->rsDatagrid;
     }
 
     /**
@@ -508,21 +508,26 @@ class DatagridDb {
 
                             foreach ($getParamsGridButtons['button'] as $keyButons => $valueButons) {
 
-                                $classConfirm = $dataConfirm = null;
+                                $classPopUp = $dataPopUp = $classConfirm = $dataConfirm = null;
 
-                                if (is_array($valueButons) and ( isset($valueButons['confirm']) and $valueButons['confirm'] = true)) {
-                                    $dataConfirm = ' data-confirm="' . $valueButons['confirmmsg'] . '"';
-                                    $classConfirm = ' ' . $valueButons['confirmclass'];
+                                if ((strtolower($keyButons) != 'custom') and ( isset($valueButons['confirm']) and $valueButons['confirm'] = 'true')) {
+                                    $dataConfirm = ' data-confirm="' . $valueButons['confirmmsg'] . '" ';
+                                    $classConfirm = ' ' . $valueButons['confirmclass'] . ' ';
+                                }
+
+                                if ((strtolower($keyButons) != 'custom') and ( isset($valueButons['popup']) and $valueButons['popup'] = 'true')) {
+                                    $dataPopUp = ' data-popup="' . $valueButons['popup'] . '" ';
+                                    $classPopUp = ' ' . $valueButons['popupclass'] . ' ';
                                 }
 
                                 if ($keyButons == 'edit' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
-                                    $aButtons[] = '<a title="Editar" href="' . $url . '/edit/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' class="btn btn-success editbtn ' . $classConfirm . '"><i class="fa fa-pencil"></i></a>';
+                                    $aButtons[] = '<a title="Editar" href="' . $url . '/edit/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' ' . $dataPopUp . ' class="btn btn-success editbtn ' . $classConfirm . ' ' . $classPopUp . '"><i class="fa fa-pencil"></i></a>';
                                 } else if ($keyButons == 'active' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
-                                    $aButtons[] = '<a title="Ativar" href="' . $url . '/goactive/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' class="btn btn-primary activebtn ' . $classConfirm . '"><i class="fa fa-check-square-o"></i></a>';
+                                    $aButtons[] = '<a title="Ativar" href="' . $url . '/goactive/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' ' . $dataPopUp . ' class="btn btn-primary activebtn ' . $classConfirm . ' ' . $classPopUp . '"><i class="fa fa-check-square-o"></i></a>';
                                 } else if ($keyButons == 'block' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
-                                    $aButtons[] = '<a title="Bloquear" href="' . $url . '/goblock/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' class="btn btn-warning blockbtn ' . $classConfirm . '"><i class="fa fa-ban"></i></a>';
+                                    $aButtons[] = '<a title="Bloquear" href="' . $url . '/goblock/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' ' . $dataPopUp . ' class="btn btn-warning blockbtn ' . $classConfirm . ' ' . $classPopUp . '"><i class="fa fa-ban"></i></a>';
                                 } else if ($keyButons == 'trash' and ( (is_array($valueButons)) ? $getParamsGridButtons['button'][$keyButons]['show'] == 'true' : $getParamsGridButtons['button'][$keyButons] == 'true')) {
-                                    $aButtons[] = '<a title="Lixeira" href="' . $url . '/gotrash/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' class="btn btn-danger trashbtn ' . $classConfirm . '"><i class="fa fa-recycle"></i></a>';
+                                    $aButtons[] = '<a title="Lixeira" href="' . $url . '/gotrash/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' ' . $dataPopUp . ' class="btn btn-danger trashbtn ' . $classConfirm . ' ' . $classPopUp . '"><i class="fa fa-recycle"></i></a>';
                                 }
 
                                 if ((strtolower($keyButons) == 'custom')) {
@@ -536,20 +541,30 @@ class DatagridDb {
 
                                             $urlButton = $this->preparePhpTagWhere($urlButton, false);
 
+                                            if (( isset($valueButons['confirm'][$keyButtonCustom]) and $valueButons['confirm'][$keyButtonCustom] = true)) {
+                                                $dataConfirm = ' data-confirm="' . $valueButons['confirmmsg'][$keyButtonCustom] . '" ';
+                                                $classConfirm = ' ' . $valueButons['confirmclass'][$keyButtonCustom] . ' ';
+                                            }
+
+                                            if (( isset($valueButons['popup'][$keyButtonCustom]) and $valueButons['popup'][$keyButtonCustom] = true)) {
+                                                $dataPopUp = ' data-popup="' . $urlButton . '" ';
+                                                $classPopUp = ' ' . $valueButons['popupclass'][$keyButtonCustom] . ' ';
+                                            }
+
+
                                             $name = (isset($valueButons['name'][$keyButtonCustom]) and ! empty($valueButons['name'][$keyButtonCustom])) ? $valueButons['name'][$keyButtonCustom] : '';
                                             $extraClass = (isset($valueButons['extraClass'][$keyButtonCustom]) and ! empty($valueButons['extraClass'][$keyButtonCustom])) ? $valueButons['extraClass'][$keyButtonCustom] : '';
                                             $btColor = (isset($valueButons['classBtColor'][$keyButtonCustom]) and ! empty($valueButons['classBtColor'][$keyButtonCustom])) ? $valueButons['classBtColor'][$keyButtonCustom] : 'btn-success';
                                             $classIcon = (isset($valueButons['classIcon'][$keyButtonCustom]) and ! empty($valueButons['classIcon'][$keyButtonCustom])) ? $valueButons['classIcon'][$keyButtonCustom] : 'fa fa-pencil';
                                             $nameIcon = (isset($valueButons['nameIcon'][$keyButtonCustom]) and ! empty($valueButons['nameIcon'][$keyButtonCustom])) ? $valueButons['nameIcon'][$keyButtonCustom] : '';
 
-                                            $aButtons[] = '<a title="' . $name . '" href="' . $urlButton . '/id/' . $primaryValue . '" data-id="' . $primaryValue . '" class="' . $extraClass . 'btn ' . $btColor . '"><i class="' . $classIcon . '">' . $nameIcon . '</i></a>';
+                                            $aButtons[] = '<a title="' . $name . '" href="' . $urlButton . '/id/' . $primaryValue . '" data-id="' . $primaryValue . '" ' . $dataConfirm . ' ' . $dataPopUp . ' class="' . $extraClass . 'btn ' . $btColor . ' ' . $classConfirm . ' ' . $classPopUp . '"><i class="' . $classIcon . '">' . $nameIcon . '</i></a>';
                                         }
                                     } else {
                                         throw new \Exception('Nenhuma url definida para o botão personalizado!', 500);
                                     }
                                 }
                             }
-
                             $returnButtons = implode('', $aButtons);
                         } else {
                             $returnButtons = '<a title="Editar" href="' . $url . '/edit/id/' . $primaryValue . '" data-id="' . $primaryValue . '" class="btn btn-success editbtn"><i class="fa fa-pencil"></i></a>'
